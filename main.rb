@@ -1,4 +1,9 @@
 require './tree.rb'
 
-arr = (Array.new(15) { rand(1..100) })
+p arr = (Array.new(15) { rand(1..100) })
 
+tree = Tree.new(arr)
+
+tree.build_tree
+
+tree.pretty_print

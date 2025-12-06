@@ -13,4 +13,16 @@ class Node
   def set_right(child)
     @right_child = child
   end
+
+  def value
+    @value
+  end
+  
+  def right_child
+    @right_child
+  end
+
+  def left_child
+    @left_child
+  end
 end
