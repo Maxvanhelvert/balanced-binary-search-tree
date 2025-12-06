@@ -14,10 +14,14 @@ class Node
     @right_child = child
   end
 
+  def set_value(value)
+    @value = value
+  end
+
   def value
     @value
   end
-  
+
   def right_child
     @right_child
   end
