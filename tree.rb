@@ -3,7 +3,7 @@ require './node.rb'
 class Tree
   
   def initialize(data)
-    @data = data.sort.uniq
+    @data = data
     @root = nil
   end
 
@@ -20,11 +20,13 @@ class Tree
     root
   end
 
-  def build_tree
-    arr = @data
+  def build_tree(arr = @data)
+    arr = arr.sort.uniq
     first = 0
-    last = @data.length - 1
+    last = arr.length - 1
     @root = build_tree_rec(arr, first, last)
+
+    balanced?
   end
 
   def insert(root = @root, data)
@@ -35,6 +37,8 @@ class Tree
     else
       root.set_right(insert(root.right_child, data))
     end
+
+    balanced?
 
     root
   end
@@ -55,6 +59,8 @@ class Tree
       root.set_right(delete(root.right_child, succ.value))
     end
 
+    balanced?
+
     root
   end
 
@@ -68,13 +74,13 @@ class Tree
     node
   end
 
-  def find(root = @root, value)
+  def find(value, root = @root)
     return nil if root.nil?
 
     if value > root.value
-      root = find(root.right_child, value)
+      root = find(value, root.right_child)
     elsif value < root.value
-      root = find(root.left_child, value)
+      root = find(value, root.left_child)
     else
       return root
     end
@@ -88,7 +94,6 @@ class Tree
 
     q = []
     res = []
-    
     q.append(root)
     level = 0
 
@@ -112,6 +117,7 @@ class Tree
 
   def in_order
     current = @root
+    return if root.nil?
     res = []
     stack = []
 
@@ -154,8 +160,8 @@ class Tree
 
   def post_order
     current = @root
+    return if current.nil?
     res = []
-    return res if current.nil?
 
     stack = []
     last_visited = nil
@@ -179,6 +185,72 @@ class Tree
     res
   end
   
+  def height(value)
+    root = find(value)
+    return nil if root.nil?
+
+    find_height(root)
+  end
+
+  def find_height(root)
+    return 0 if root.nil?
+
+    l_height = find_height(root.left_child)
+    return -1 if l_height == -1
+    r_height = find_height(root.right_child)
+    return -1 if r_height == -1
+
+    return -1 if (l_height - r_height).abs > 1
+
+    return [l_height, r_height].max + 1
+  end
+
+  def depth(value)
+    root = @root
+    return if root.nil?
+
+    q = []
+    q.append(root)
+    level = 0
+
+    until q.empty?
+      q_len = q.length
+
+      for _each in 1..q_len do
+        node = q.shift
+        return level if node.value == value
+
+        q.append(node.left_child) unless node.left_child.nil?
+        q.append(node.right_child) unless node.right_child.nil?
+      end
+      level += 1
+    end
+
+    nil
+  end
+
+  def balanced?
+    rebalance if find_height(@root) == -1
+  end
+
+  def rebalance
+    nodes = []
+
+    store_in_order(@root, nodes)
+
+    build_tree(nodes)
+  end
+
+  def store_in_order(root, nodes)
+    return if root.nil?
+
+    store_in_order(root.left_child, nodes)
+
+    nodes.append(root.value)
+
+    store_in_order(root.right_child, nodes)
+  end 
+
   def pretty_print(node = @root, prefix = '', is_left = true)
     pretty_print(node.right_child, "#{prefix}#{is_left ? '│   ' : '    '}", false) if node.right_child
     puts "#{prefix}#{is_left ? '└── ' : '┌── '}#{node.value}"

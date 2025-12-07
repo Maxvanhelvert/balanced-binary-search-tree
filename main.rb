@@ -9,4 +9,10 @@ tree.build_tree
 
 tree.pretty_print
 
-tree.post_order {|node| puts node}
+new_arr = (Array.new(15) { rand(1..100) })
+
+new_arr.each do |value|
+  tree.insert(value)
+end
+
+tree.pretty_print
